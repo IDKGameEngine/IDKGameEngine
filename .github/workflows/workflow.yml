@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       source-ref:
-        description: Optional ref for the external libidk and game repositories
+        description: Optional dependency ref (defaults to the engine ref)
         type: string
         required: false
 
@@ -33,7 +33,7 @@ jobs:
         shell: bash
 
     env:
-      IDK_SOURCE_REF: ${{ inputs.source-ref || '' }}
+      IDK_SOURCE_REF: ${{ inputs.source-ref || github.ref_name }}
       IDK_PRESET: ${{ matrix.preset }}
 
     steps:

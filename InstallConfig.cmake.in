@@ -1,0 +1,6 @@
+# Install defaults only once. Subsequent builds preserve the user's runtime settings.
+set(config "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/engine.cfg")
+if(NOT EXISTS "${config}")
+    file(INSTALL "@CMAKE_CURRENT_SOURCE_DIR@/engine.cfg"
+         DESTINATION "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}")
+endif()

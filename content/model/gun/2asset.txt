@@ -1,0 +1,8 @@
+// #[attribute] [type] [name] [num keyframes] //
+
+#ASSETNAME gun
+
+#STATIC
+#ENVIRONMENTAL
+
+GEOMETRYMESH gun

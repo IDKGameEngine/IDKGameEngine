@@ -1,0 +1,19 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Project (Debug)",
+            "type": "shell",
+            "command": "distrobox enter steamrt4 -- ./build.sh --preset=debug",
+            "group": { "kind": "build" },
+            "options": { "cwd": "${workspaceFolder}" }
+        },
+        {
+            "label": "Run Project (Debug)",
+            "type": "shell",
+            "command": "distrobox enter steamrt4 -- ./build-debug/game",
+            "group": { "kind": "build" },
+            "options": { "cwd": "${workspaceFolder}" }
+        }
+    ]
+}

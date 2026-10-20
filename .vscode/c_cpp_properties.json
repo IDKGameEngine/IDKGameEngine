@@ -1,0 +1,29 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${default}",
+                "~/.local/share/containers/storage/overlay/4ba3cf89b3fe99a77056211770ff74fb34483fdc9d95ebe7ae004a219493d6b6/diff/usr/include",
+                "${workspaceFolder}/local/include",
+                "${workspaceFolder}/thirdparty/glad/include",
+                "${workspaceFolder}/thirdparty/imgui",
+                "${workspaceFolder}/thirdparty/imgui/backends",
+                "${workspaceFolder}/common/include",
+                "${workspaceFolder}/editor/include",
+                "${workspaceFolder}/engine/include",
+                "${workspaceFolder}/gfx/include",
+                "${workspaceFolder}/../libidk/include"
+            ],
+            "defines": [
+                "IDK_DEBUG",
+                "IDK_CONTENT_BASEPATH=\"content\""
+            ],
+            "compilerPath": "/usr/bin/clang++",
+            "cStandard": "c99",
+            "cppStandard": "c++20",
+            "intelliSenseMode": "linux-gcc-x64"
+        }
+    ],
+    "version": 4
+}

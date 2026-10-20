@@ -1,0 +1,115 @@
+name: Build Debug and Release
+
+on:
+  push:
+  workflow_dispatch:
+    inputs:
+      source-ref:
+        description: Optional ref for the external libidk and game repositories
+        type: string
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Linux x86_64 ${{ matrix.preset }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        preset: [debug, release]
+    container:
+      image: registry.gitlab.steamos.cloud/steamrt/steamrt4/sdk
+
+    defaults:
+      run:
+        shell: bash
+
+    env:
+      IDK_SOURCE_REF: ${{ inputs.source-ref || '' }}
+      IDK_PRESET: ${{ matrix.preset }}
+
+    steps:
+      - name: Install build tools
+        run: |
+          apt-get update
+          apt-get install --yes --no-install-recommends \
+            build-essential \
+            ca-certificates \
+            cmake \
+            git \
+            libgl-dev \
+            ninja-build \
+            pkg-config \
+            python3 \
+            unzip \
+            wget
+
+      # The token needs Contents: Read access to external dependencies and
+      # third-party submodules. Checkout converts their SSH URLs to HTTPS.
+      - name: Checkout project and dependencies
+        uses: actions/checkout@v6
+        with:
+          path: IDKGameEngine
+          submodules: recursive
+          token: ${{ secrets.IDK_REPO_READ_TOKEN || github.token }}
+          persist-credentials: false
+
+      # These two projects remain independent and sit beside this checkout.
+      - name: Checkout idk_game
+        uses: actions/checkout@v6
+        with:
+          repository: IDKGameEngine/idk_game
+          ref: ${{ env.IDK_SOURCE_REF }}
+          path: idk_game
+          token: ${{ secrets.IDK_REPO_READ_TOKEN || github.token }}
+          persist-credentials: false
+
+      - name: Checkout libidk
+        uses: actions/checkout@v6
+        with:
+          repository: IDKGameEngine/libidk
+          ref: ${{ env.IDK_SOURCE_REF }}
+          path: libidk
+          token: ${{ secrets.IDK_REPO_READ_TOKEN || github.token }}
+          persist-credentials: false
+
+      - name: Build third-party dependencies
+        working-directory: IDKGameEngine
+        run: ./dep-build.sh
+
+      - name: Build and install ${{ matrix.preset }}
+        working-directory: IDKGameEngine
+        run: ./build.sh --preset="$IDK_PRESET"
+
+      - name: Package ${{ matrix.preset }}
+        working-directory: IDKGameEngine
+        run: |
+          build_dir="build-${IDK_PRESET}"
+
+          for binary in game editor mapedit mapc; do
+            test -x "$build_dir/$binary"
+          done
+          test -d "$build_dir/content"
+          test -s "$build_dir/version.txt"
+          test -s "$build_dir/steam_appid.txt"
+
+          # Exclude intermediate build files. Tar preserves executable bits and
+          # library symlinks when the artifact is downloaded and extracted.
+          tar --exclude="$build_dir/cmake" \
+            -czf "idk-linux-x86_64-${IDK_PRESET}.tar.gz" "$build_dir"
+
+      - name: Upload ${{ matrix.preset }} artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: IDKGameEngine/idk-linux-x86_64-${{ matrix.preset }}.tar.gz
+          archive: false
+          if-no-files-found: error
+          retention-days: 30

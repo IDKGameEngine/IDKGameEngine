@@ -1,5 +1,3 @@
 /.local/
-/build-cmake/
 /build-debug/
 /build-release/
-/idk-linux-x86_64-*.tar.gz

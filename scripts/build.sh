@@ -38,5 +38,5 @@ fi
 cd "$ROOT_DIR"
 cmake --preset "$opt_preset" -DIDK_APP_NAME="$opt_appname" "${cmake_opts[@]}"
 cmake --build --preset "$opt_preset" --parallel "$(nproc)"
-cmake --install "${ROOT_DIR}/build-${opt_preset}/cmake"
+cmake --install "${ROOT_DIR}/build-cmake/${opt_preset}"
 "${THIS_DIR}/version.sh" "build-${opt_preset}"

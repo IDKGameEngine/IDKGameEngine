@@ -398,7 +398,7 @@ namespace idk::mapedit
         auto result = mSession.save(path, overwrite);
         if (result == MapSession::SaveResult::Saved)
             std::snprintf(mPath, sizeof(mPath), "%s", path);
-        else if (result == MapSession::SaveResult::AlreadyExists)
+        else if (!overwrite && result == MapSession::SaveResult::AlreadyExists)
         {
             std::snprintf(mOverwritePath, sizeof(mOverwritePath), "%s", path);
             mConfirmOverwrite = true;

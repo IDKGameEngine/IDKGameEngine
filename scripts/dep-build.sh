@@ -10,11 +10,11 @@ CMAKE_FLAGS=()
 PLATFORM=$(uname -s)
 if [ "$PLATFORM" == "Linux" ]; then
     echo "Linux environment detected"
-    INSTALL_PREFIX="${REPO_DIR}/local"
+    INSTALL_PREFIX="${REPO_DIR}/.local"
     CMAKE_FLAGS+=("-DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX}")
 elif [[ "$PLATFORM" == *"Windows"* ]]; then
     echo "Windows environment detected"
-    INSTALL_PREFIX="${REPO_DIR}/local-win"
+    INSTALL_PREFIX="${REPO_DIR}/.local-win"
     CMAKE_FLAGS+=("-DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX}"
                  "-DCMAKE_TOOLCHAIN_FILE=${REPO_DIR}/cmake/mingw-toolchain.cmake")
 else

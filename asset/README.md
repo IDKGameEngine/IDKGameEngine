@@ -131,9 +131,9 @@ Inside `steamrt4`, configure with `-DIDK_BUILD_ASSET_TESTS=ON` and
 `-DIDK_BUILD_GFX_TESTS=ON`, build, then run:
 
 ```bash
-ctest --test-dir build-debug/cmake/asset --output-on-failure
+ctest --test-dir build-cmake/debug/asset --output-on-failure
 SDL_VIDEODRIVER=offscreen \
-    ctest --test-dir build-debug/cmake/gfx --output-on-failure
+    ctest --test-dir build-cmake/debug/gfx --output-on-failure
 ```
 
 Tests are also compiled without exceptions. They check imported geometry, PBR

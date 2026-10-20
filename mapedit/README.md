@@ -112,7 +112,7 @@ editor.
 
 Enable `IDK_BUILD_EDITOR_TESTS=ON` to build `idk_mapedit_tests` and
 `idk_map_dialog_tests`. Run them directly or with
-`ctest --test-dir build-debug/cmake/mapedit --output-on-failure`.
+`ctest --test-dir build-cmake/debug/mapedit --output-on-failure`.
 The map tests check shape and marker commands, slot reuse, picking, full/empty map
 roundtrips, reflected transforms, overwrite protection, failed saves, malformed
 inputs, duplicate marker rejection, and transactional load rollback.

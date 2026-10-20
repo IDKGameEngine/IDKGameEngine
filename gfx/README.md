@@ -155,14 +155,14 @@ Avoid scalar layouts and Vulkan-only shader features when targeting OpenGL.
 Configure with `-DIDK_BUILD_GFX_TESTS=ON`, build `idk_gfx_smoke`, then run:
 
 ```bash
-ctest --test-dir build-debug/cmake/gfx --output-on-failure
+ctest --test-dir build-cmake/debug/gfx --output-on-failure
 ```
 
 On systems with SDL's offscreen driver and Mesa software rendering:
 
 ```bash
 SDL_VIDEODRIVER=offscreen LIBGL_ALWAYS_SOFTWARE=1 \
-    ctest --test-dir build-debug/cmake/gfx --output-on-failure
+    ctest --test-dir build-cmake/debug/gfx --output-on-failure
 ```
 
 The test creates a real GL context and reads rendered pixels to check camera/model

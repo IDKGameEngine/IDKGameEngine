@@ -230,7 +230,7 @@ Enable `IDK_BUILD_EDITOR_TESTS=ON`, build `idk_level_tests` and
 
 ```bash
 SDL_VIDEODRIVER=offscreen SDL_AUDIODRIVER=dummy \
-    ctest --test-dir build-debug/cmake/level --output-on-failure
+    ctest --test-dir build-cmake/debug/level --output-on-failure
 SDL_VIDEODRIVER=offscreen SDL_AUDIODRIVER=dummy \
     ./build-debug/game --level build-debug/content/level/playground.idklvl --frames 10
 ```

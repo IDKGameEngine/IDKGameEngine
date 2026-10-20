@@ -91,20 +91,7 @@ jobs:
 
       - name: Package ${{ matrix.preset }}
         working-directory: IDKGameEngine
-        run: |
-          build_dir="build-${IDK_PRESET}"
-
-          for binary in game editor mapedit mapc; do
-            test -x "$build_dir/$binary"
-          done
-          test -d "$build_dir/content"
-          test -s "$build_dir/version.txt"
-          test -s "$build_dir/steam_appid.txt"
-
-          # Exclude intermediate build files. Tar preserves executable bits and
-          # library symlinks when the artifact is downloaded and extracted.
-          tar --exclude="$build_dir/cmake" \
-            -czf "idk-linux-x86_64-${IDK_PRESET}.tar.gz" "$build_dir"
+        run: ./scripts/package.sh --preset="$IDK_PRESET"
 
       - name: Upload ${{ matrix.preset }} artifact
         uses: actions/upload-artifact@v7

@@ -73,7 +73,7 @@ Link `idkgameplay` to use the controllers; it depends only on
 `idk_player_controller_tests` and `idk_controller_variants_tests`, then run:
 
 ```bash
-ctest --test-dir build-debug/cmake/gameplay --output-on-failure
+ctest --test-dir build-cmake/debug/gameplay --output-on-failure
 ```
 
 These checks run against independent bodies without loading a level or physics

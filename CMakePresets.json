@@ -12,14 +12,14 @@
             "hidden": true,
             "generator": "Ninja",
             "cacheVariables": {
-                "CMAKE_PREFIX_PATH": "${sourceDir}/local",
+                "CMAKE_PREFIX_PATH": "${sourceDir}/.local",
                 "IDK_CONTENT_BASEPATH": "content"
             }
         },
         {
             "name": "debug",
             "inherits": "base-config",
-            "binaryDir": "${sourceDir}/build-debug/cmake",
+            "binaryDir": "${sourceDir}/build-cmake/debug",
             "installDir": "${sourceDir}/build-debug",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug"
@@ -28,7 +28,7 @@
         {
             "name": "release",
             "inherits": "base-config",
-            "binaryDir": "${sourceDir}/build-release/cmake",
+            "binaryDir": "${sourceDir}/build-cmake/release",
             "installDir": "${sourceDir}/build-release",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"

@@ -36,6 +36,119 @@ namespace
         glReadPixels(x, y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, result.data());
         return result;
     }
+
+    bool checkerChecks(RenderEngine &renderer, idk::EngineAPI &api)
+    {
+        using namespace idk::asset;
+        Vertex vertices[4];
+        vertices[0].position = {-1, -1, 0};
+        vertices[1].position = {1, -1, 0};
+        vertices[2].position = {1, 1, 0};
+        vertices[3].position = {-1, 1, 0};
+        vertices[0].uv = {0, 0};
+        vertices[1].uv = {1, 0};
+        vertices[2].uv = {1, 1};
+        vertices[3].uv = {0, 1};
+        uint32_t indices[] = {0, 1, 2, 0, 2, 3};
+        const VertexAttribute attributes[] = {
+            {0, VertexAttribType::Float3, offsetof(Vertex, position)},
+            {1, VertexAttribType::Float2, offsetof(Vertex, uv)}};
+        auto mesh = renderer.CreateMesh({vertices, 4, sizeof(Vertex), indices, 6, attributes});
+        MaterialDesc description;
+        description.shader = renderer.GetDefaultShader();
+        description.baseColor = {0, 1, 0, 1};
+        description.pattern = MaterialPattern::Checker;
+        auto material = renderer.CreateMaterial(description);
+        CHECK(mesh.isValid() && material.isValid(), "Could not create procedural material resources");
+        renderer.SetCamera({});
+        renderer.onPreRender(api);
+        CHECK(renderer.Submit({mesh, material}), "Checker submission failed");
+        renderer.onMidRender(api);
+        auto light = pixel(4, 4), dark = pixel(12, 4);
+        CHECK(light[1] > 240 && dark[1] > 45 && dark[1] < 70 &&
+                  light[0] < 10 && dark[0] < 10 && dark[3] > 240,
+              "Procedural material must alternate tinted checks without a texture");
+        renderer.onPreRender(api);
+        CHECK(renderer.Submit({mesh, material, glm::scale(glm::mat4(1), glm::vec3(3, 2, 1))}),
+              "Scaled checker submission failed");
+        renderer.onMidRender(api);
+        CHECK(pixel(4, 4) == light && pixel(12, 4) == dark,
+              "Nonuniform scaling must not stretch procedural checks");
+        const glm::vec3 axes[] = {{1, 0, 0}, {0, 1, 0}};
+        for (auto axis : axes)
+        {
+            auto rotation = glm::rotate(glm::mat4(1), glm::radians(90.0f), axis);
+            renderer.SetCamera({glm::inverse(rotation), glm::mat4(1)});
+            renderer.onPreRender(api);
+            CHECK(renderer.Submit({mesh, material, rotation}), "Side-face checker submission failed");
+            renderer.onMidRender(api);
+            auto a = pixel(4, 4), b = pixel(12, 4);
+            CHECK((a[1] > 240 && b[1] > 45 && b[1] < 70) ||
+                      (b[1] > 240 && a[1] > 45 && a[1] < 70),
+                  "Checker must project onto vertical and horizontal faces");
+            renderer.onPreRender(api);
+            CHECK(renderer.Submit({mesh, material, glm::scale(rotation, glm::vec3(3, 2, 1))}),
+                  "Scaled side-face checker submission failed");
+            renderer.onMidRender(api);
+            CHECK(pixel(4, 4) == a && pixel(12, 4) == b,
+                  "Scaling a side face changed the world-space pattern");
+        }
+        renderer.SetCamera({});
+        renderer.DestroyMaterial(material);
+        renderer.DestroyMesh(mesh);
+        description.pattern = MaterialPattern(99);
+        CHECK(!renderer.CreateMaterial(description).isValid(), "Unknown material patterns must be rejected");
+
+        Primitive primitive{"Checker", vertices, indices, 0};
+        Material source;
+        source.baseColor = {0, 1, 0, 1};
+        source.pattern = MaterialPattern::Checker;
+        uint32_t ref = 0;
+        Node node;
+        node.primitives = {&ref, 1};
+        Model model;
+        model.primitives = {&primitive, 1};
+        model.materials = {&source, 1};
+        model.nodes = {&node, 1};
+        auto uploaded = renderer.UploadModel(model);
+        CHECK(uploaded.isValid(), "Procedural model upload failed");
+        renderer.onPreRender(api);
+        CHECK(renderer.SubmitModel(uploaded), "Procedural model submission failed");
+        renderer.onMidRender(api);
+        CHECK(pixel(4, 4) == light && pixel(12, 4) == dark, "Model upload lost the procedural material");
+        renderer.DestroyModel(uploaded);
+
+        for (auto &vertex : vertices)
+        {
+            vertex.uv *= 64.0f;
+            vertex.position *= glm::vec3(3, 2, 1);
+        }
+        uploaded = renderer.UploadModel(model);
+        CHECK(uploaded.isValid(), "Baked procedural model upload failed");
+        renderer.onPreRender(api);
+        CHECK(renderer.SubmitModel(uploaded), "Baked procedural model submission failed");
+        renderer.onMidRender(api);
+        CHECK(pixel(4, 4) == light && pixel(12, 4) == dark,
+              "Baked geometry and UV density must not change world-space check size");
+        renderer.DestroyModel(uploaded);
+
+        for (auto &vertex : vertices)
+            vertex.position *= 64.0f;
+        Camera distant;
+        distant.proj = glm::scale(glm::mat4(1), glm::vec3(1.0f / 64, 1.0f / 64, 1));
+        renderer.SetCamera(distant);
+        uploaded = renderer.UploadModel(model);
+        CHECK(uploaded.isValid(), "Minified procedural model upload failed");
+        renderer.onPreRender(api);
+        CHECK(renderer.SubmitModel(uploaded), "Minified procedural model submission failed");
+        renderer.onMidRender(api);
+        CHECK(pixel(8, 8)[1] > 150 && pixel(8, 8)[1] < 160 &&
+                  pixel(24, 8)[1] > 150 && pixel(24, 8)[1] < 160,
+              "Subpixel checks should filter to their average colour");
+        renderer.DestroyModel(uploaded);
+        renderer.SetCamera({});
+        return true;
+    }
 }
 
 bool runChecks(RenderEngine &renderer, idk::EngineAPI &api)
@@ -216,6 +329,7 @@ bool runChecks(RenderEngine &renderer, idk::EngineAPI &api)
     CHECK(pixel(64, 64)[0] > 240, "Viewport must reset to full window every frame");
     renderer.DestroyMaterial(maskMaterial);
     renderer.DestroyMesh(maskMesh);
+    CHECK(checkerChecks(renderer, api), "Procedural material checks failed");
 
     // Capacity failure is explicit and cannot grow a hidden draw vector.
     auto capacityMesh = renderer.CreateMesh(meshDesc);

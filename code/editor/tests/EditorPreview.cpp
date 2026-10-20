@@ -5,6 +5,7 @@
 #include "libidk/gpu/gl.hpp"
 #include <SDL3/SDL.h>
 #include <array>
+#include <algorithm>
 #include <cstdio>
 #include <cstdlib>
 #include <unistd.h>
@@ -42,10 +43,10 @@ namespace
         }
     };
 
-    std::array<uint8_t, 4> pixel()
+    std::array<uint8_t, 4> pixel(int x = 64, int y = 64)
     {
         std::array<uint8_t, 4> color{};
-        glReadPixels(64, 64, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, color.data());
+        glReadPixels(x, y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, color.data());
         return color;
     }
 
@@ -84,10 +85,30 @@ bool checks(idk::gfx::RenderEngine &renderer, idk::EngineAPI &api)
     CHECK(preview.submit(renderer, session.document(), error), error);
     renderer.onMidRender(api);
     CHECK(pixel()[1] > 80 && pixel()[0] < 10, "Material editing did not update the preview");
+    session.selected()->material.pattern = idk::asset::MaterialPattern::Checker;
+    renderer.onPreRender(api);
+    CHECK(preview.submit(renderer, session.document(), error), error);
+    renderer.onMidRender(api);
+    auto a = pixel(36, 36), b = pixel(44, 36);
+    CHECK(std::max(a[1], b[1]) > 80 && std::min(a[1], b[1]) < .4f * std::max(a[1], b[1]) &&
+              a[0] < 10 && b[0] < 10,
+          "Checker material did not update the preview or preserve its tint");
+    session.selected()->scale = {2, 1.5f, 1};
+    renderer.onPreRender(api);
+    CHECK(preview.submit(renderer, session.document(), error), error);
+    renderer.onMidRender(api);
+    CHECK(pixel(36, 36) == a && pixel(44, 36) == b,
+          "Scaling a box stretched its procedural material in the editor");
+    session.selected()->scale = {1, 1, 1};
+    session.selected()->material.pattern = idk::asset::MaterialPattern::Solid;
     session.addShape(idk::asset::ShapeKind::Sphere);
     session.selected()->position = {3, 0, 0};
     Temporary file;
     CHECK(file.create(), "Cannot create temporary directory");
+    session.document().get(0)->material.pattern = idk::asset::MaterialPattern::Checker;
+    CHECK(session.exportModel(file.path) == EditorSession::ExportResult::Failed,
+          "GLB export silently discarded a procedural material");
+    session.document().get(0)->material.pattern = idk::asset::MaterialPattern::Solid;
     CHECK(session.exportModel(file.path) == EditorSession::ExportResult::Saved, session.status());
     CHECK(session.exportModel(file.path) == EditorSession::ExportResult::AlreadyExists,
           "Overwrite confirmation was bypassed");

@@ -79,7 +79,16 @@ namespace
                   session.marker(ObjectRole::Exit) == NoIndex,
               "A new level should be empty");
 
-        session.addShape(ShapeKind::Box);
+        session.addCheckerBox();
+        CHECK(session.selected() && session.selected()->shape == ShapeKind::Box &&
+                  session.selected()->material.pattern == idk::asset::MaterialPattern::Checker,
+              "Checker box did not receive its procedural material");
+        session.duplicateSelection();
+        CHECK(session.document().count() == 2 &&
+                  session.selected()->material.pattern == idk::asset::MaterialPattern::Checker,
+              "Duplicating a checker box lost its material");
+        session.deleteSelection();
+        session.select(0);
         session.selected()->scale = {12, .5f, 12};
         session.selected()->position.y = -.25f;
         session.addShape(ShapeKind::Sphere);
@@ -147,7 +156,8 @@ namespace
             CHECK(before && after && before->shape == after->shape && before->position == after->position &&
                       before->rotation == after->rotation && before->scale == after->scale &&
                       before->color == after->color && !std::strcmp(before->name, after->name) &&
-                      before->material.doubleSided == after->material.doubleSided,
+                      before->material.doubleSided == after->material.doubleSided &&
+                      before->material.pattern == after->material.pattern,
                   "Shape data changed during save/open");
         }
         CHECK(loaded.selection() == NoIndex, "Loading must clear stale selection");
@@ -183,7 +193,11 @@ namespace
                                     "scale 1 1 1\ncolour 1 1 1 1\n";
         const char *invalid[] = {
             "",
-            "IDKMAP 3\nobjects 0\n",
+            "IDKMAP 4\nobjects 0\n",
+            "IDKMAP 3\ndestination\nobjects 1\nobject 0 0\nname Bad pattern\nposition 0 0 0\n"
+            "rotation 0 0 0\nscale 1 1 1\ncolour 1 1 1 1\npattern 2\n",
+            "IDKMAP 3\ndestination\nobjects 1\nobject 0 0\nname Missing pattern\nposition 0 0 0\n"
+            "rotation 0 0 0\nscale 1 1 1\ncolour 1 1 1 1\n",
             "IDKMAP 2\nobjects 0\n",
             "IDKMAP 2\ndestination ../outside.idklvl\nobjects 0\n",
             "IDKMAP 2\ndestination wrong.idkmap\nobjects 0\n",
@@ -228,6 +242,15 @@ namespace
               "Cannot write legacy map");
         CHECK(legacy.load(files.malformed) && !legacy.destination().path[0],
               "Version 1 maps must load with no destination");
+        CHECK(legacy.document().get(0)->material.pattern == idk::asset::MaterialPattern::Solid,
+              "Legacy terrain must default to a solid material");
+        CHECK(writeText(files.malformed, "IDKMAP 2\ndestination level/next.idklvl\nobjects 1\nobject 0 0\n"
+                                         "name Old map\nposition 0 0 0\nrotation 0 0 0\nscale 1 1 1\ncolour 1 1 1 1\n"),
+              "Cannot write version 2 map");
+        CHECK(legacy.load(files.malformed) &&
+                  legacy.document().get(0)->material.pattern == idk::asset::MaterialPattern::Solid &&
+                  !std::strcmp(legacy.destination().path, "level/next.idklvl"),
+              "Version 2 maps must retain their destination and use solid materials");
         legacy = loaded;
         legacy.select(exit);
         legacy.deleteSelection();
@@ -263,6 +286,11 @@ namespace
               "An empty work-in-progress map must roundtrip");
         for (uint32_t i = 0; i < idk::editor::ShapeDocument::Capacity; ++i)
             loaded.addShape(ShapeKind::Box);
+        uint32_t lastSelection = loaded.selection();
+        loaded.addCheckerBox();
+        CHECK(loaded.selection() == lastSelection &&
+                  loaded.selected()->material.pattern == idk::asset::MaterialPattern::Solid,
+              "Adding a checker box to a full scene modified an existing object");
         loaded.placeMarker(ObjectRole::Entry);
         CHECK(loaded.document().count() == idk::editor::ShapeDocument::Capacity &&
                   loaded.marker(ObjectRole::Entry) == NoIndex,

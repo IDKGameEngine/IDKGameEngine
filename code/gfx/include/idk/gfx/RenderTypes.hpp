@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Handle.hpp"
+#include "idk/asset/MaterialPattern.hpp"
 #include <glm/glm.hpp>
 #include <cstddef>
 #include <span>
@@ -111,6 +112,7 @@ namespace idk::gfx
         bool depthTest = true;
         bool depthWrite = true;
         bool doubleSided = false;
+        asset::MaterialPattern pattern = asset::MaterialPattern::Solid;
     };
 
     struct Camera

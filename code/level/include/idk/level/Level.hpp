@@ -23,6 +23,7 @@ namespace idk::level
         char name[48]{};
         glm::vec4 colour{1};
         bool doubleSided = false;
+        asset::MaterialPattern pattern = asset::MaterialPattern::Solid;
         // Baked world-space geometry; collision uses the same triangles.
         std::span<asset::Vertex> vertices;
         std::span<uint32_t> indices;

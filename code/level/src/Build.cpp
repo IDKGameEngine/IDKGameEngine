@@ -41,6 +41,7 @@ namespace idk::level
             std::memcpy(destination.name, source->name, 48);
             destination.colour = source->color;
             destination.doubleSided = source->material.doubleSided;
+            destination.pattern = source->material.pattern;
             destination.vertices = arena.array<asset::Vertex>(geometry.vertices.size());
             destination.indices = arena.array<uint32_t>(geometry.indices.size());
             if (arena.failed())

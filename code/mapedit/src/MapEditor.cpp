@@ -118,7 +118,12 @@ namespace idk::mapedit
                     object->scale[c] = std::copysign(.001f, previous[c]);
         }
         if (mSession.role(mSession.selection()) == ObjectRole::Terrain)
+        {
             ImGui::ColorEdit4("Colour", glm::value_ptr(object->color));
+            int pattern = int(object->material.pattern);
+            if (ImGui::Combo("Material", &pattern, "Solid\0Checker\0"))
+                object->material.pattern = asset::MaterialPattern(pattern);
+        }
         else
             ImGui::TextWrapped("This coloured mesh marks a location; its centre is the saved marker position.");
     }
@@ -135,6 +140,8 @@ namespace idk::mapedit
             if (ImGui::Button(asset::ShapeName(kind), ImVec2(width, 0)))
                 mSession.addShape(kind);
         }
+        if (ImGui::Button("Checker box", ImVec2(-1, 0)))
+            mSession.addCheckerBox();
         ImGui::SeparatorText("Level locations");
         if (ImGui::Button("Spawn / entry (green)", ImVec2(-1, 0)))
             mSession.placeMarker(ObjectRole::Entry);

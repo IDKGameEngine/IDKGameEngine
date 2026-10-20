@@ -67,6 +67,17 @@ texture selects a white fallback; an invalid sampler selects linear repeat
 sampling. Custom samplers support all six glTF minification filters, nearest/linear
 magnification, and independent repeat/clamp/mirrored-repeat wrapping per axis.
 
+Set `MaterialDesc::pattern` to `idk::asset::MaterialPattern::Checker` to add a
+procedural checker pattern to the default material. It needs no texture image:
+the shader alternates the base colour with a darker tint, with eight squares
+per world unit (0.125 metres per square on axis-aligned faces). The pattern is
+anchored to world space and projected onto the dominant face plane, so scaling
+geometry changes the number of checks rather than their size.
+Pixel-footprint filtering blends small checks to reduce aliasing.
+`asset::Material::pattern` carries the same choice through `UploadModel`.
+The editor preview uses the same pattern function. GLB export rejects procedural
+materials because the exporter does not bake them into images.
+
 ```cpp
 // onInit: retain handles in the application.
 idk::gfx::MaterialDesc desc;
@@ -133,10 +144,12 @@ Shared definitions are in `include/idk/gfx/slang/slang.hpp`:
 | PerFrameData | UBO 1 | 32 bytes, std140 |
 | PerCameraData | UBO 2 | View + Proj, 128 bytes, std140 |
 | PerDrawData | UBO 3 | Model, 64 bytes, std140 |
-| MaterialData | UBO 4 | baseColor + alpha mode/cutoff, 32 bytes, std140 |
+| MaterialData | UBO 4 | baseColor + alpha mode/cutoff/pattern, 32 bytes, std140 |
 | Albedo | Texture unit 5 | Slang Sampler2D / GLSL sampler2D |
 
 Use `UniformBufferRO` for these blocks and `mul(matrix, vector)` for transforms.
+`MaterialData::alpha.z` is the pattern identifier (0 solid, 1 checker); custom
+shaders can opt into this convention.
 Slang may represent the equivalent transform as row-major matrices and
 vector-matrix multiplication in emitted GLSL; do not rewrite that generated code.
 C++ size/offset assertions and the rendering integration test check the shared

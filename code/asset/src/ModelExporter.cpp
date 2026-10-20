@@ -143,6 +143,8 @@ namespace idk::asset
                     return fail(ExportErrorCode::Unsupported, "This exporter supports untextured static models");
                 for (const auto &m : model.materials)
                 {
+                    if (m.pattern != MaterialPattern::Solid)
+                        return fail(ExportErrorCode::Unsupported, "Procedural materials cannot be exported to GLB");
                     for (auto slot : {m.baseColorTexture, m.normalTexture, m.metallicRoughnessTexture,
                                       m.occlusionTexture, m.emissiveTexture})
                         if (slot != NoIndex)

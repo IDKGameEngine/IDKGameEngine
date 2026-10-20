@@ -1,5 +1,6 @@
 #pragma once
 
+#include "MaterialPattern.hpp"
 #include <glm/glm.hpp>
 #include <cstdint>
 #include <limits>
@@ -94,6 +95,7 @@ namespace idk::asset
         AlphaMode alphaMode = AlphaMode::Opaque;
         float alphaCutoff = 0.5f;
         bool doubleSided = false;
+        MaterialPattern pattern = MaterialPattern::Solid;
     };
 
     struct Node

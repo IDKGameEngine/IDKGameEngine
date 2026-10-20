@@ -75,10 +75,11 @@ namespace idk::mapedit
             if (!readLine(file, line))
                 return false;
             bool version2 = !std::strcmp(line, "IDKMAP 2");
-            if (!version2 && std::strcmp(line, "IDKMAP 1"))
+            bool version3 = !std::strcmp(line, "IDKMAP 3");
+            if (!version3 && !version2 && std::strcmp(line, "IDKMAP 1"))
                 return false;
             candidate.clear();
-            if (version2)
+            if (version2 || version3)
             {
                 if (!readLine(file, line))
                     return false;
@@ -122,13 +123,21 @@ namespace idk::mapedit
                     !readVector(file, "rotation", &object->rotation.x, 3) ||
                     !readVector(file, "scale", &object->scale.x, 3) || !readVector(file, "colour", &object->color.x, 4))
                     return false;
+                if (version3)
+                {
+                    uint32_t pattern = 0;
+                    if (!readUnsignedFields(file, "pattern", {&pattern, 1}) ||
+                        pattern > uint32_t(asset::MaterialPattern::Checker))
+                        return false;
+                    object->material.pattern = asset::MaterialPattern(pattern);
+                }
             }
             return std::fgetc(file) == EOF && !std::ferror(file);
         }
 
         bool writeMap(FILE *file, const MapSession &session)
         {
-            if (std::fprintf(file, "IDKMAP 2\ndestination%s%s\nobjects %u\n", session.destination().path[0] ? " " : "",
+            if (std::fprintf(file, "IDKMAP 3\ndestination%s%s\nobjects %u\n", session.destination().path[0] ? " " : "",
                              session.destination().path, session.document().count()) < 0)
                 return false;
             for (uint32_t i = 0; i < editor::ShapeDocument::Capacity; ++i)
@@ -139,13 +148,13 @@ namespace idk::mapedit
                 if (std::fprintf(file,
                                  "object %u %u\nname %s\n"
                                  "position %.9g %.9g %.9g\nrotation %.9g %.9g %.9g\n"
-                                 "scale %.9g %.9g %.9g\ncolour %.9g %.9g %.9g %.9g\n",
+                                 "scale %.9g %.9g %.9g\ncolour %.9g %.9g %.9g %.9g\npattern %u\n",
                                  unsigned(session.role(i)), unsigned(object->shape), object->name,
                                  double(object->position.x), double(object->position.y), double(object->position.z),
                                  double(object->rotation.x), double(object->rotation.y), double(object->rotation.z),
                                  double(object->scale.x), double(object->scale.y), double(object->scale.z),
                                  double(object->color.r), double(object->color.g), double(object->color.b),
-                                 double(object->color.a)) < 0)
+                                 double(object->color.a), unsigned(object->material.pattern)) < 0)
                     return false;
             }
             return true;
@@ -229,6 +238,21 @@ namespace idk::mapedit
         ShapeSession::duplicateSelection();
     }
 
+    void MapSession::addCheckerBox()
+    {
+        uint32_t slot = mDocument.add(asset::ShapeKind::Box);
+        if (slot == asset::NoIndex)
+        {
+            setStatus("The map is full. Delete an object to add a checker box.");
+            return;
+        }
+        auto &object = *mDocument.get(slot);
+        object.material.pattern = asset::MaterialPattern::Checker;
+        std::snprintf(object.name, sizeof(object.name), "Checker box %u", slot + 1);
+        select(slot);
+        mStatus[0] = 0;
+    }
+
     void MapSession::deleteSelection()
     {
         if (mSelection == mEntry)
@@ -258,6 +282,7 @@ namespace idk::mapedit
             if (!object)
                 continue;
             if (uint32_t(object->shape) >= editor::ShapeDocument::ShapeCount ||
+                uint32_t(object->material.pattern) > uint32_t(asset::MaterialPattern::Checker) ||
                 !std::memchr(object->name, 0, sizeof(object->name)) || std::strpbrk(object->name, "\r\n"))
                 return false;
             for (unsigned c = 0; c < 3; ++c)

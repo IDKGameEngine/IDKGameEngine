@@ -75,7 +75,7 @@ namespace IDK_SLANG_NAMESPACE
     {
         IDK_GPU_CONST uint32_t BIND_IDX = 4;
         vec4 baseColor;
-        vec4 alpha; // mode: 0 opaque, 1 mask, 2 blend; cutoff in y
+        vec4 alpha; // x: alpha mode, y: cutoff, z: pattern (0 solid, 1 checker)
     };
 
     IDK_GPU_CONST uint32_t BIND_ALBEDO = 5;

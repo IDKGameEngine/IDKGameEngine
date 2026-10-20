@@ -190,18 +190,21 @@ tested by playtesting rather than inferred by the compiler.
 
 `.idklvl` is versioned, little-endian data with explicit IEEE float32 fields:
 
-- Eight-byte `IDKLVL\r\n` signature, uint32 version (2), uint32 terrain count.
+- Eight-byte `IDKLVL\r\n` signature, uint32 version (3), uint32 terrain count.
 - Entry and exit: position XYZ, rotation XYZ in degrees, signed scale XYZ.
 - A 256-byte zero-terminated destination path; empty means completion.
-- Per terrain: 48-byte zero-terminated name, RGBA floats, uint32 double-sided
-  flag, uint32 vertex count, uint32 index count.
+- Per terrain: 48-byte zero-terminated name, RGBA floats, uint32 flags
+  (bit 0: double-sided, bit 1: checker material), uint32 vertex count,
+  uint32 index count.
 - Per vertex: position XYZ, normal XYZ, UV, tangent XYZW, colour RGBA floats.
 - Per triangle: three uint32 indices local to that terrain's vertices.
 
 There are at most 62 terrain objects, 32,768 vertices, and 196,608 indices.
 Both build and load use caller-owned arenas. The runner supplies two 4 MiB
 banks so preparation cannot overwrite the active level, plus 64 KiB of model
-descriptor scratch. Version 1 artifacts remain readable with no destination.
+descriptor scratch. Versions 1 and 2 remain readable with solid materials;
+version 1 has no destination. The checker material uses world positions,
+so it matches the map editor and keeps its size when terrain is scaled.
 Failed loads rewind the arena and retain the caller's previous level. File
 writes use a temporary file in the output directory and publish atomically.
 Jolt owns its collision allocations and uses an 8 MiB update scratch allocator.

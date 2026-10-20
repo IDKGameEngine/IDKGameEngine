@@ -27,7 +27,7 @@ namespace idk::editor
         bool sameMaterial(const gfx::MaterialDesc &a, const gfx::MaterialDesc &b)
         {
             return a.shader == b.shader && a.baseColor == b.baseColor && a.blend == b.blend &&
-                   a.alphaCutoff == b.alphaCutoff && a.doubleSided == b.doubleSided;
+                   a.alphaCutoff == b.alphaCutoff && a.doubleSided == b.doubleSided && a.pattern == b.pattern;
         }
     } // namespace
 
@@ -86,6 +86,7 @@ namespace idk::editor
         description.shader = mShader;
         description.baseColor = object.color;
         description.doubleSided = object.material.doubleSided;
+        description.pattern = object.material.pattern;
         description.alphaCutoff = object.material.alphaCutoff;
         switch (object.material.alphaMode)
         {

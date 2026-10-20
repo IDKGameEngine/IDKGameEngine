@@ -28,6 +28,7 @@ namespace idk::mapedit
         ObjectRole role(uint32_t slot) const;
         uint32_t marker(ObjectRole) const;
         void placeMarker(ObjectRole);
+        void addCheckerBox();
         void duplicateSelection() override;
         void deleteSelection() override;
         void clear() override;

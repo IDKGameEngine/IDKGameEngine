@@ -346,7 +346,7 @@ namespace
         Level level;
         CHECK(!Build(session, arena, level, error));
         CHECK(arena.mark() == 0);
-        session.addShape(asset::ShapeKind::Box);
+        session.addCheckerBox();
         session.selected()->scale = {20, 1, 20};
         session.selected()->position = {0, -.5f, 0};
         session.placeMarker(mapedit::ObjectRole::Entry);
@@ -367,6 +367,13 @@ namespace
         std::snprintf(session.destination().path, sizeof(session.destination().path), "level/next.idklvl");
         CHECK(Build(session, arena, level, error));
         CHECK(level.terrain.size() == 4);
+        CHECK(level.terrain[0].pattern == asset::MaterialPattern::Checker);
+        CHECK(level.terrain[1].pattern == asset::MaterialPattern::Solid);
+        alignas(16) std::byte modelStorage[64 * 1024];
+        Arena modelArena(modelStorage);
+        asset::Model model;
+        CHECK(level.model(modelArena, model, error));
+        CHECK(model.materials[0].pattern == asset::MaterialPattern::Checker);
         CHECK(level.entry.rotation.y == 45);
         CHECK(level.terrain[0].vertices[0].position == glm::vec3(10, -1, -10));
         for (const auto &object : level.terrain)
@@ -400,6 +407,7 @@ namespace
         {
             CHECK(result.terrain[i].vertices.size() == level.terrain[i].vertices.size());
             CHECK(result.terrain[i].indices.size() == level.terrain[i].indices.size());
+            CHECK(result.terrain[i].pattern == level.terrain[i].pattern);
             for (size_t j = 0; j < level.terrain[i].vertices.size(); ++j)
                 CHECK(result.terrain[i].vertices[j].position == level.terrain[i].vertices[j].position);
         }
@@ -429,6 +437,8 @@ namespace
         file = std::fopen(path, "wb");
         CHECK(file);
         auto version = bytes[8];
+        auto flags = bytes[408];
+        bytes[408] &= 1; // Legacy formats only support double-sided terrain.
         bytes[8] = 1;
         CHECK(std::fwrite(bytes.data(), 1, 88, file) == 88);
         CHECK(std::fwrite(bytes.data() + 344, 1, size - 344, file) == size - 344);
@@ -437,6 +447,18 @@ namespace
         Level legacy;
         CHECK(Load(path, read, legacy, error));
         CHECK(!legacy.destination.path[0] && legacy.terrain.size() == level.terrain.size());
+        CHECK(legacy.terrain[0].pattern == asset::MaterialPattern::Solid);
+        read.rewind(mark);
+        bytes[8] = 2;
+        file = std::fopen(path, "wb");
+        CHECK(file);
+        CHECK(std::fwrite(bytes.data(), 1, size, file) == size);
+        std::fclose(file);
+        CHECK(Load(path, read, legacy, error));
+        CHECK(!std::strcmp(legacy.destination.path, "level/next.idklvl") &&
+              legacy.terrain[0].pattern == asset::MaterialPattern::Solid);
+        bytes[8] = version;
+        bytes[408] = flags;
         read.rewind(mark);
         // Header version/count and terrain flags/counts/first position/first index.
         const size_t corrupt[] = {0, 8, 12, 88, 408, 412, 416, 420, 420 + 24 * 64};

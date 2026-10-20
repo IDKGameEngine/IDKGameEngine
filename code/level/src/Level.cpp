@@ -101,7 +101,7 @@ namespace idk::level
             char magic[8];
             std::memcpy(magic, Magic, 8);
             stream.bytes(magic, 8);
-            uint32_t version = 2, count = uint32_t(level.terrain.size());
+            uint32_t version = 3, count = uint32_t(level.terrain.size());
             stream.integer(version);
             stream.integer(count);
             auto entry = level.entry, exit = level.exit;
@@ -116,7 +116,9 @@ namespace idk::level
                 stream.bytes(name, 48);
                 auto color = object.colour;
                 stream.vector(&color.x, 4);
-                uint32_t flags = object.doubleSided ? 1 : 0, vertices = uint32_t(object.vertices.size()),
+                uint32_t flags = (object.doubleSided ? 1u : 0u) |
+                                 (object.pattern == asset::MaterialPattern::Checker ? 2u : 0u),
+                         vertices = uint32_t(object.vertices.size()),
                          indices = uint32_t(object.indices.size());
                 stream.integer(flags);
                 stream.integer(vertices);
@@ -157,6 +159,8 @@ namespace idk::level
         {
             vertices += object.vertices.size();
             indices += object.indices.size();
+            if (uint32_t(object.pattern) > uint32_t(asset::MaterialPattern::Checker))
+                return error.set("Unsupported terrain material pattern.");
             if (!std::memchr(object.name, 0, 48) || !colour(object.colour) || object.vertices.empty() ||
                 object.indices.empty() || object.indices.size() % 3 || vertices > MaxVertices || indices > MaxIndices)
                 return error.set("Invalid terrain name, colour, geometry counts, or level capacity.");
@@ -199,6 +203,7 @@ namespace idk::level
             candidate.primitives[i] = {object.name, object.vertices, object.indices, uint32_t(i), true};
             candidate.materials[i].baseColor = object.colour;
             candidate.materials[i].doubleSided = object.doubleSided;
+            candidate.materials[i].pattern = object.pattern;
             candidate.materials[i].metallic = 0;
             candidate.nodes[i].name = object.name;
             refs[i] = uint32_t(i);
@@ -249,13 +254,13 @@ namespace idk::level
         stream.integer(version);
         stream.integer(count);
         Level candidate;
-        bool ok = stream.ok && !std::memcmp(magic, Magic, 8) && (version == 1 || version == 2) && count > 0 &&
+        bool ok = stream.ok && !std::memcmp(magic, Magic, 8) && version >= 1 && version <= 3 && count > 0 &&
                   count <= Level::MaxTerrain;
         if (ok)
         {
             stream.location(candidate.entry);
             stream.location(candidate.exit);
-            if (version == 2)
+            if (version >= 2)
                 stream.bytes(candidate.destination.path, sizeof(candidate.destination.path));
             candidate.terrain = arena.array<Terrain>(count);
             ok = !arena.failed();
@@ -270,13 +275,14 @@ namespace idk::level
             stream.integer(flags);
             stream.integer(vertices);
             stream.integer(indices);
-            ok = stream.ok && flags <= 1 && vertices > 0 && indices > 0 && indices % 3 == 0 &&
+            ok = stream.ok && flags <= (version >= 3 ? 3u : 1u) && vertices > 0 && indices > 0 && indices % 3 == 0 &&
                  vertices <= Level::MaxVertices - totalVertices && indices <= Level::MaxIndices - totalIndices;
             if (!ok)
                 break;
             totalVertices += vertices;
             totalIndices += indices;
-            object.doubleSided = flags != 0;
+            object.doubleSided = (flags & 1) != 0;
+            object.pattern = (flags & 2) ? asset::MaterialPattern::Checker : asset::MaterialPattern::Solid;
             object.vertices = arena.array<asset::Vertex>(vertices);
             object.indices = arena.array<uint32_t>(indices);
             ok = !arena.failed();

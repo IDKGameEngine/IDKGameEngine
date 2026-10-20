@@ -17,6 +17,13 @@ pressing its button again selects the existing marker. The coloured marker
 meshes are editing aids, and their centres are the saved location coordinates.
 Markers can be moved, rotated, scaled, renamed, deleted, and placed again.
 
+**Checker box** adds a box with a shader-generated checker material. The
+inspector's **Material** selector switches terrain between **Solid** and
+**Checker**; **Colour** tints both. The pattern uses eight squares per world
+unit, so scaling a box adds checks instead of stretching them. It is visible
+in the editor and **Build & Play**
+and is preserved when duplicating, saving, or reopening a map.
+
 Select an object in the list or by clicking its mesh. Edit position, rotation,
 scale, name, and terrain colour in the inspector, or use the transform gizmo.
 The ground grid uses metre units. **Snap** exposes move, angle, and scale steps;
@@ -66,11 +73,11 @@ empty to finish the run. Build destination maps separately; **Build & Play**
 compiles only the current document. Failed transitions leave the current level
 running and can be retried by leaving and re-entering the exit.
 
-New saves use `IDKMAP 2`, with a destination line before `objects N`, followed
+New saves use `IDKMAP 3`, with a destination line before `objects N`, followed
 by N records:
 
 ```text
-IDKMAP 2
+IDKMAP 3
 destination level/finish.idklvl
 objects 1
 object 0 0
@@ -79,17 +86,19 @@ position 0 -0.25 0
 rotation 0 0 0
 scale 12 0.5 12
 colour 0.65 0.72 0.9 1
+pattern 1
 ```
 
 Roles are terrain=0, entry=1, exit=2. Primitive types are box=0, sphere=1,
-cylinder=2, plane=3. Entry uses a cylinder and exit uses a box. Names occupy a
+cylinder=2, plane=3. Patterns are solid=0 and checker=1. Entry uses a cylinder
+and exit uses a box. Names occupy a
 single line of at most 47 bytes; numbers must be finite. Files contain LF or
 CRLF line endings and end after the final record's newline. Unknown versions,
 duplicate markers, invalid records, and more than 64 objects are rejected.
 An empty destination is written as `destination` followed by a newline. Paths
 are at most 255 bytes and must be relative `.idklvl` paths without `.`/`..`
-components. Version 1 maps (without the destination line) remain readable and
-have no destination. Deleting the exit clears its destination.
+components. Versions 1 and 2 remain readable with solid materials. Version 1
+maps have no destination. Deleting the exit clears its destination.
 Use **Build level...** to choose a `.idklvl` output with an SDL save dialog, or
 **Build & Play** to launch the game with the current document, including unsaved
 changes. Builds require terrain, entry, and exit. **Stop playtest** closes the child game.

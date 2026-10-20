@@ -675,6 +675,11 @@ namespace idk::gfx
     {
         if (!mImpl || !mImpl->checkThread())
             return {};
+        if (desc.pattern != asset::MaterialPattern::Solid && desc.pattern != asset::MaterialPattern::Checker)
+        {
+            error("Material has an unsupported procedural pattern");
+            return {};
+        }
         if (!lookup(mImpl->shaders, desc.shader) ||
             (desc.texture.isValid() && !lookup(mImpl->textures, desc.texture)) ||
             (desc.sampler.isValid() && !lookup(mImpl->samplers, desc.sampler)))
@@ -824,6 +829,7 @@ namespace idk::gfx
                                                                      : BlendMode::Opaque;
                 desc.alphaCutoff = m.alphaCutoff;
                 desc.doubleSided = m.doubleSided;
+                desc.pattern = m.pattern;
                 if (m.baseColorTexture != NoIndex)
                 {
                     const auto &texture = source.textures[m.baseColorTexture];
@@ -1155,7 +1161,7 @@ namespace idk::gfx
                 slang::MaterialData data{material.baseColor, glm::vec4(material.blend == BlendMode::Alpha  ? 2.0f
                                                                        : material.blend == BlendMode::Mask ? 1.0f
                                                                                                            : 0.0f,
-                                                                       material.alphaCutoff, 0, 0)};
+                                                                       material.alphaCutoff, float(material.pattern), 0)};
                 glNamedBufferSubData(s.materialBuffer.id, 0, sizeof(data), &data);
             }
             slang::PerDrawData draw{item.transform};

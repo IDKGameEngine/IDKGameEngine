@@ -1,6 +1,6 @@
 # Shape model editor
 
-Build inside Steam Runtime using `./env.sh`, followed by `./build.sh` from the
+Build inside Steam Runtime using `./scripts/env.sh`, followed by `./scripts/build.sh` from the
 workspace root. Launch `./build-debug/editor` from the same container. The editor
 starts with a box; **New model** clears the document after confirmation.
 

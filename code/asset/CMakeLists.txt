@@ -17,10 +17,10 @@ if(IDK_BUILD_ASSET_TESTS)
     add_executable(idk_asset_tests tests/ModelImport.cpp)
     target_link_libraries(idk_asset_tests PRIVATE idkengine_assets)
     target_compile_options(idk_asset_tests PRIVATE -fno-exceptions)
-    target_compile_definitions(idk_asset_tests PRIVATE IDK_ASSET_TEST_DATA="${CMAKE_CURRENT_SOURCE_DIR}/tests/data")
+    target_compile_definitions(idk_asset_tests PRIVATE IDK_ASSET_TEST_DATA="${CMAKE_SOURCE_DIR}/data/tests/asset")
     add_test(NAME idk_asset_tests COMMAND idk_asset_tests)
 endif()
 
 # Keep the demo model alongside engine examples.
-install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/examples/instanced-cubes.glb"
+install(FILES "${CMAKE_SOURCE_DIR}/data/examples/instanced-cubes.glb"
     DESTINATION "${CMAKE_INSTALL_PREFIX}/content/model/sample")

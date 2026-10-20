@@ -83,11 +83,11 @@ jobs:
 
       - name: Build third-party dependencies
         working-directory: IDKGameEngine
-        run: ./dep-build.sh
+        run: ./scripts/dep-build.sh
 
       - name: Build and install ${{ matrix.preset }}
         working-directory: IDKGameEngine
-        run: ./build.sh --preset="$IDK_PRESET"
+        run: ./scripts/build.sh --preset="$IDK_PRESET"
 
       - name: Package ${{ matrix.preset }}
         working-directory: IDKGameEngine

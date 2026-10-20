@@ -5,7 +5,7 @@
     },
     "C_Cpp.default.compilerPath": "/usr/bin/clang++",
     "slang.additionalSearchPaths": [
-        "/home/michael/devel/idk/idk_gfx/h"
+        "${workspaceFolder}/code/gfx/include"
     ],
     "files.exclude": {
         "**/.git": true
@@ -16,7 +16,6 @@
         "**/.hg/store/**": true,
         "${workspaceFolder}/build-debug/**": true,
         "${workspaceFolder}/build-release/**": true,
-        "${workspaceFolder}/idk/**": true,
         "${workspaceFolder}/thirdparty/**": true,
     },
     "files.participants.timeout": 100,

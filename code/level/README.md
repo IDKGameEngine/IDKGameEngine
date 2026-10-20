@@ -1,6 +1,6 @@
 # Level build and playtest pipeline
 
-Build and install inside `steamrt4` with the usual workspace `./build.sh`.
+Build and install inside `steamrt4` with the usual workspace `./scripts/build.sh`.
 The build produces `mapc`, `mapedit`, and the game executable, and compiles
 examples into `content/level/playground.idklvl` and `content/level/finish.idklvl`.
 No additional dependencies are needed; the playtest controller uses the project's
@@ -39,7 +39,7 @@ To play the full chain directly from the workspace root:
 ./build-debug/game --level build-debug/content/level/parkour_01_first_steps.idklvl
 ```
 
-Editable originals live in `level/examples/parkour_*.idkmap`. The build
+Editable originals live in `data/examples/level/parkour_*.idkmap`. The build
 replaces installed copies from these originals, so save lasting edits back to
 the source map before rebuilding the workspace. Release builds install the same
 series under `build-release/content/level`.
@@ -230,7 +230,7 @@ Enable `IDK_BUILD_EDITOR_TESTS=ON`, build `idk_level_tests` and
 
 ```bash
 SDL_VIDEODRIVER=offscreen SDL_AUDIODRIVER=dummy \
-    ctest --test-dir build-cmake/debug/level --output-on-failure
+    ctest --test-dir build-cmake/debug/code/level --output-on-failure
 SDL_VIDEODRIVER=offscreen SDL_AUDIODRIVER=dummy \
     ./build-debug/game --level build-debug/content/level/playground.idklvl --frames 10
 ```

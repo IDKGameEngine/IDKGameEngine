@@ -6,8 +6,9 @@ import struct
 import zlib
 
 HERE = Path(__file__).resolve().parent
-DATA = HERE / 'data'
-DATA.mkdir(exist_ok=True)
+ROOT = HERE.parents[2]
+DATA = ROOT / 'data/tests/asset'
+DATA.mkdir(parents=True, exist_ok=True)
 
 
 def png():
@@ -106,6 +107,6 @@ for normal, corners in faces:
 cube_nodes = [{'name': 'cubes', 'children': [1, 2]}, {'name': 'left cube', 'translation': [-.8, 0, 0], 'mesh': 0},
               {'name': 'mirrored cube', 'translation': [.8, 0, 0], 'scale': [-1, 1, 1], 'mesh': 0}]
 cube, cube_blob = make(positions, normals, uvs, indices, cube_nodes)
-out = HERE.parent / 'examples'
+out = ROOT / 'data/examples'
 out.mkdir(parents=True, exist_ok=True)
 (out / 'instanced-cubes.glb').write_bytes(glb(cube, cube_blob))

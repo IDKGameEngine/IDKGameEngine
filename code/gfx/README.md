@@ -6,9 +6,10 @@ but are not part of the active renderer target.
 ## Build environment
 
 Build inside the Steam Linux Runtime container. From the workspace root, run
-`./env.sh` to enter `steamrt4`, then run `./build.sh` in that shell. Do not reuse
-the same CMake build directory between host and container builds: cached system
-library paths and compiler artifacts belong to the environment that created them.
+`./scripts/env.sh` to enter `steamrt4`, then run `./scripts/build.sh` in that
+shell. Do not reuse the same CMake build directory between host and container
+builds: cached system library paths and compiler artifacts belong to the
+environment that created them.
 After an accidental host build, configure with `cmake --fresh --preset debug
 -DIDK_APP_NAME=game` from the project root inside the
 container, clean the build artifacts, then run the normal build script.
@@ -26,13 +27,13 @@ Install or reinstall the compiler from the workspace root inside `steamrt4`:
 
 ```bash
 git submodule update --init --recursive
-./dep-build.sh vulkan-sdk
-./build.sh
+./scripts/dep-build.sh vulkan-sdk
+./scripts/build.sh
 ```
 
 Older SDK installers stripped executable permissions from tools. If
-`local/bin/slangc` exists but CMake cannot find it, repair the existing
-installation with `chmod u+x local/bin/slangc`, then run `./build.sh`.
+`.local/bin/slangc` exists but CMake cannot find it, repair the existing
+installation with `chmod u+x .local/bin/slangc`, then run `./scripts/build.sh`.
 
 `shaders/default.slang` is compiled separately for its vertex and fragment entry
 points, targeting GLSL 4.60 with column-major matrix storage. The resulting GLSL
@@ -155,14 +156,14 @@ Avoid scalar layouts and Vulkan-only shader features when targeting OpenGL.
 Configure with `-DIDK_BUILD_GFX_TESTS=ON`, build `idk_gfx_smoke`, then run:
 
 ```bash
-ctest --test-dir build-cmake/debug/gfx --output-on-failure
+ctest --test-dir build-cmake/debug/code/gfx --output-on-failure
 ```
 
 On systems with SDL's offscreen driver and Mesa software rendering:
 
 ```bash
 SDL_VIDEODRIVER=offscreen LIBGL_ALWAYS_SOFTWARE=1 \
-    ctest --test-dir build-cmake/debug/gfx --output-on-failure
+    ctest --test-dir build-cmake/debug/code/gfx --output-on-failure
 ```
 
 The test creates a real GL context and reads rendered pixels to check camera/model

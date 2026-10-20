@@ -5,14 +5,18 @@
             "includePath": [
                 "${default}",
                 "~/.local/share/containers/storage/overlay/4ba3cf89b3fe99a77056211770ff74fb34483fdc9d95ebe7ae004a219493d6b6/diff/usr/include",
-                "${workspaceFolder}/local/include",
+                "${workspaceFolder}/.local/include",
                 "${workspaceFolder}/thirdparty/glad/include",
                 "${workspaceFolder}/thirdparty/imgui",
                 "${workspaceFolder}/thirdparty/imgui/backends",
-                "${workspaceFolder}/common/include",
-                "${workspaceFolder}/editor/include",
-                "${workspaceFolder}/engine/include",
-                "${workspaceFolder}/gfx/include",
+                "${workspaceFolder}/code/asset/include",
+                "${workspaceFolder}/code/common/include",
+                "${workspaceFolder}/code/editor/include",
+                "${workspaceFolder}/code/engine/include",
+                "${workspaceFolder}/code/gameplay/include",
+                "${workspaceFolder}/code/gfx/include",
+                "${workspaceFolder}/code/level/include",
+                "${workspaceFolder}/code/mapedit/include",
                 "${workspaceFolder}/../libidk/include"
             ],
             "defines": [

@@ -7,9 +7,9 @@ if(NOT IDK_SLANGC)
     message(FATAL_ERROR
         "Slang shader compiler (slangc) was not found or is not executable.\n"
         "From the workspace root inside steamrt4, run:\n"
-        "  ./dep-build.sh vulkan-sdk\n"
+        "  ./scripts/dep-build.sh vulkan-sdk\n"
         "If slangc is already installed, repair its executable permission with:\n"
-        "  chmod u+x local/bin/slangc\n"
+        "  chmod u+x .local/bin/slangc\n"
         "For a custom installation, pass -DIDK_SLANGC=/absolute/path/to/slangc.")
 endif()
 

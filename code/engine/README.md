@@ -150,7 +150,7 @@ With `IDK_BUILD_EDITOR_TESTS=ON`, build `idk_character_tests`,
 `idk_timing_tests`, and `idk_timing_reload_tests`, then run:
 
 ```bash
-ctest --test-dir build-cmake/debug/engine --output-on-failure
+ctest --test-dir build-cmake/debug/code/engine --output-on-failure
 ```
 
 The reload test uses offscreen OpenGL 4.6 and checks the real F5 event path,

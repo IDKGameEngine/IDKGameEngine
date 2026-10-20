@@ -19,7 +19,7 @@
         {
             "name": "debug",
             "inherits": "base-config",
-            "binaryDir": "${sourceDir}/build-cmake/debug",
+            "binaryDir": "${sourceDir}/build-debug/cmake",
             "installDir": "${sourceDir}/build-debug",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug"
@@ -28,7 +28,7 @@
         {
             "name": "release",
             "inherits": "base-config",
-            "binaryDir": "${sourceDir}/build-cmake/release",
+            "binaryDir": "${sourceDir}/build-release/cmake",
             "installDir": "${sourceDir}/build-release",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"

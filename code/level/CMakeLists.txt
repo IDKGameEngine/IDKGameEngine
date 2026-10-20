@@ -25,11 +25,12 @@ foreach(name playground finish
         parkour_04_balance parkour_05_finale)
     set(example "${CMAKE_CURRENT_BINARY_DIR}/${name}.idklvl")
     add_custom_command(OUTPUT "${example}"
-        COMMAND $<TARGET_FILE:mapc> "${CMAKE_CURRENT_SOURCE_DIR}/examples/${name}.idkmap" "${example}" --force
-        DEPENDS mapc "${CMAKE_CURRENT_SOURCE_DIR}/examples/${name}.idkmap"
+        COMMAND $<TARGET_FILE:mapc> "${CMAKE_SOURCE_DIR}/data/examples/level/${name}.idkmap" "${example}" --force
+        DEPENDS mapc "${CMAKE_SOURCE_DIR}/data/examples/level/${name}.idkmap"
         VERBATIM)
     list(APPEND examples "${example}")
-    install(FILES "examples/${name}.idkmap" "${example}" DESTINATION "${CMAKE_INSTALL_PREFIX}/content/level")
+    install(FILES "${CMAKE_SOURCE_DIR}/data/examples/level/${name}.idkmap" "${example}"
+        DESTINATION "${CMAKE_INSTALL_PREFIX}/content/level")
 endforeach()
 add_custom_target(idk_playtest_example ALL DEPENDS ${examples})
 

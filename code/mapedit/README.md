@@ -1,8 +1,8 @@
 # Basic level editor
 
 `mapedit` is built and installed alongside `editor` by the normal workspace
-`./build.sh` command. Launch `./build-debug/mapedit` in the same environment used
-for `editor` (Steam Runtime via `./env.sh` when needed).
+`./scripts/build.sh` command. Launch `./build-debug/mapedit` in the same environment used
+for `editor` (Steam Runtime via `./scripts/env.sh` when needed).
 
 Five linked [parkour courses](../level/README.md#parkour-series) are included in
 the normal build. Choose **Open...**, select
@@ -112,7 +112,7 @@ editor.
 
 Enable `IDK_BUILD_EDITOR_TESTS=ON` to build `idk_mapedit_tests` and
 `idk_map_dialog_tests`. Run them directly or with
-`ctest --test-dir build-cmake/debug/mapedit --output-on-failure`.
+`ctest --test-dir build-cmake/debug/code/mapedit --output-on-failure`.
 The map tests check shape and marker commands, slot reuse, picking, full/empty map
 roundtrips, reflected transforms, overwrite protection, failed saves, malformed
 inputs, duplicate marker rejection, and transactional load rollback.

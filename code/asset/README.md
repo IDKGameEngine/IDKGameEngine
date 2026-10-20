@@ -131,9 +131,9 @@ Inside `steamrt4`, configure with `-DIDK_BUILD_ASSET_TESTS=ON` and
 `-DIDK_BUILD_GFX_TESTS=ON`, build, then run:
 
 ```bash
-ctest --test-dir build-cmake/debug/asset --output-on-failure
+ctest --test-dir build-cmake/debug/code/asset --output-on-failure
 SDL_VIDEODRIVER=offscreen \
-    ctest --test-dir build-cmake/debug/gfx --output-on-failure
+    ctest --test-dir build-cmake/debug/code/gfx --output-on-failure
 ```
 
 Tests are also compiled without exceptions. They check imported geometry, PBR
@@ -141,4 +141,4 @@ metadata, hierarchy/instancing, external and embedded images, pixel orientation,
 malformed/unsupported files, both arena exhaustion paths and rollback, fixed-list
 and draw-queue overflow, alpha/depth rendering, and GPU independence from reset
 CPU storage. Original fixtures/demo can be regenerated with
-`python3 asset/tests/GenerateFixtures.py` from the project root.
+`python3 code/asset/tests/GenerateFixtures.py` from the project root.

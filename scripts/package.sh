@@ -32,23 +32,6 @@ case "$opt_preset" in
         ;;
 esac
 
-build_dir="build-${opt_preset}"
-for binary in "$opt_appname" editor mapedit mapc; do
-    if [[ ! -x "${ROOT_DIR}/${build_dir}/${binary}" ]]; then
-        echo "Missing executable: ${build_dir}/${binary}" >&2
-        exit 1
-    fi
-done
-if [[ ! -d "${ROOT_DIR}/${build_dir}/content" ]]; then
-    echo "Missing package content: ${build_dir}/content" >&2
-    exit 1
-fi
-for path in version.txt steam_appid.txt; do
-    if [[ ! -s "${ROOT_DIR}/${build_dir}/${path}" ]]; then
-        echo "Missing package content: ${build_dir}/${path}" >&2
-        exit 1
-    fi
-done
-
-cd "$ROOT_DIR"
-tar -czf "idk-linux-x86_64-${opt_preset}.tar.gz" "$build_dir"
+build_dir="$ROOT_DIR/build-${opt_preset}"
+cd "$build_dir"
+tar -czf "idkge-linux-x86_64-${opt_preset}.tar.gz" "idkge"

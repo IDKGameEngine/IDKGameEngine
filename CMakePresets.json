@@ -20,7 +20,7 @@
             "name": "debug",
             "inherits": "base-config",
             "binaryDir": "${sourceDir}/build-debug/cmake",
-            "installDir": "${sourceDir}/build-debug",
+            "installDir": "${sourceDir}/build-debug/idkge",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug"
             }
@@ -29,7 +29,7 @@
             "name": "release",
             "inherits": "base-config",
             "binaryDir": "${sourceDir}/build-release/cmake",
-            "installDir": "${sourceDir}/build-release",
+            "installDir": "${sourceDir}/build-release/idkge",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"
             }

@@ -96,7 +96,7 @@ jobs:
       - name: Upload ${{ matrix.preset }} artifact
         uses: actions/upload-artifact@v7
         with:
-          path: IDKGameEngine/idk-linux-x86_64-${{ matrix.preset }}.tar.gz
+          path: IDKGameEngine/build-${{ matrix.preset }}/idkge-linux-x86_64-${{ matrix.preset }}.tar.gz
           archive: false
           if-no-files-found: error
           retention-days: 30

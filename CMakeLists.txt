@@ -10,9 +10,17 @@ set(IDK_APP_NAME "game" CACHE STRING "Name of the optional game executable")
 set(IDK_LIBIDK_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../libidk" CACHE PATH "Path to libidk")
 set(IDK_GAME_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../idk_game" CACHE PATH "Path to the optional game")
 set(IDK_CONTENT_BASEPATH "content" CACHE STRING "Installed content directory")
+option(IDK_NETWORK_ONLY "Build headless networking without graphics, physics or Steamworks" OFF)
 
 if(NOT EXISTS "${IDK_LIBIDK_DIR}/CMakeLists.txt")
     message(FATAL_ERROR "libidk was not found at ${IDK_LIBIDK_DIR}. Set IDK_LIBIDK_DIR.")
+endif()
+
+if(IDK_NETWORK_ONLY)
+    find_package(glm REQUIRED)
+    add_subdirectory("${IDK_LIBIDK_DIR}" "${CMAKE_BINARY_DIR}/libidk")
+    add_subdirectory(code/network)
+    return()
 endif()
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/CMakeLists.txt")
@@ -31,6 +39,7 @@ install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/data/content/" DESTINATION "${IDK
 
 add_subdirectory(code/asset)
 add_subdirectory(code/common)
+add_subdirectory(code/network)
 add_subdirectory(code/editor)
 add_subdirectory(code/mapedit)
 add_subdirectory(code/level)
@@ -39,7 +48,7 @@ add_subdirectory(code/gameplay)
 add_subdirectory(code/gfx)
 
 add_library(idkengine STATIC)
-target_link_libraries(idkengine PUBLIC idkengine_common idkengine_gfx idkengine_engine)
+target_link_libraries(idkengine PUBLIC idkengine_common idkengine_gfx idkengine_engine idkengine_network)
 
 if(EXISTS "${IDK_GAME_DIR}/CMakeLists.txt")
     set(IDK_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")

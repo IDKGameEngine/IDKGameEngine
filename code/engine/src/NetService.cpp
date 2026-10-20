@@ -1,28 +1,14 @@
-// #include "idk/engine/NetService.hpp"
+#include "idk/engine/NetService.hpp"
 
+void idk::NetService::onUpdate(EngineAPI &)
+{
+    double now = net::nowSeconds();
+    if (mClient) mClient->poll(now);
+    if (mServer) mServer->poll(now);
+}
 
-// idk::NetService::NetService(idk::Platform &plat)
-// :   IDK_SERVICE_CTOR(NetService),
-//     mPlat(plat)
-// {
-
-// }
-
-
-// idk::NetService::~NetService()
-// {
-
-// }
-
-
-// void idk::NetService::update(idk::IEngine *E)
-// {
-//     (void)E;
-// }
-
-
-// void idk::NetService::shutdown(idk::IEngine *E)
-// {
-//     (void)E;
-// }
-
+void idk::NetService::onShutdown(EngineAPI &)
+{
+    if (mClient) mClient->disconnect();
+    if (mServer) mServer->stop();
+}

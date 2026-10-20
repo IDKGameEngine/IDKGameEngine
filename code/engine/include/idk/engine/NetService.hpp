@@ -1,21 +1,23 @@
 #pragma once
 
-#include "libidk/Engine.hpp"
 #include "libidk/Service.hpp"
+#include "idk/network/Network.hpp"
 
 namespace idk
 {
-    class NetService: public idk::core::Service
+    // Borrows an already opened session. Session must outlive the service.
+    // Simulation and snapshot publication remain in the game's fixed update.
+    class NetService final: public Service
     {
-    private:
-        idk::Platform &mPlat;
-
     public:
-        NetService(idk::Platform&);
-        ~NetService();
+        explicit NetService(net::Client &client): mClient(&client) {}
+        explicit NetService(net::Server &server): mServer(&server) {}
+        void onInit(EngineAPI &) override {}
+        void onUpdate(EngineAPI &) override;
+        void onShutdown(EngineAPI &) override;
 
-        virtual void update(idk::IEngine*) final;
-        virtual void shutdown(idk::IEngine*) final;
-
+    private:
+        net::Client *mClient = nullptr;
+        net::Server *mServer = nullptr;
     };
 }

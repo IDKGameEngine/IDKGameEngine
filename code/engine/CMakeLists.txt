@@ -18,12 +18,13 @@ target_include_directories(
 )
 target_link_libraries(
     ${PROJECT_NAME}
-    PUBLIC idkengine_common idkengine_gfx idkengine_character
+    PUBLIC idkengine_common idkengine_gfx idkengine_character idkengine_network
     PRIVATE Steamworks::Steamworks Jolt::Jolt
 )
 target_sources(
     ${PROJECT_NAME} PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/src/Engine.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/NetService.cpp"
 )
 
 if(IDK_BUILD_EDITOR_TESTS)

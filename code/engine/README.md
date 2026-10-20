@@ -1,5 +1,8 @@
 # Character control
 
+For server-authoritative entities, client replicas and the optional `NetService`
+adapter, see [networking](../network/README.md).
+
 ## Timing configuration
 
 Edit `engine.cfg` beside the installed executable (normally

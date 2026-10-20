@@ -16,6 +16,10 @@ locations, pass `-DIDK_LIBIDK_DIR=/absolute/path` and
 The engine and editors build without the demo game; **Build & Play** in the map
 editor requires an installed game executable.
 
+[Networking](code/network/README.md) provides server-authoritative entities,
+client snapshots and resource-ID mapping over libidk's `RemoteRxTxer`, with a
+headless server/client demo and a graphics-free `IDK_NETWORK_ONLY` build.
+
 Build inside the Steam Linux Runtime container:
 
 ```bash
